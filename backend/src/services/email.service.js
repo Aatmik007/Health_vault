@@ -96,3 +96,14 @@ export const sendVerificationOtpEmail = async (toEmail, otp) => {
     throw new Error(`Failed to send verification email: ${error.message}`);
   }
 };
+return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    connectionTimeout: 15000, // 15 seconds max wait
+    socketTimeout: 15000,
+    auth: {
+      user,
+      pass,
+    },
+  });
