@@ -41,6 +41,7 @@ app.use(
       if (
         !origin ||
         allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') || // Automatically allow all Vercel deployment URLs
         (process.env.NODE_ENV !== 'production' && (origin.includes('localhost') || origin.includes('127.0.0.1')))
       ) {
         callback(null, true);
