@@ -18,6 +18,8 @@ const getTransporter = () => {
     host,
     port,
     secure,
+    connectionTimeout: 15000, // 15 seconds max wait
+    socketTimeout: 15000,
     auth: {
       user,
       pass,
@@ -61,7 +63,7 @@ export const sendVerificationOtpEmail = async (toEmail, otp) => {
     text: `Welcome to HealthVault!\n\nYour 6-digit email verification code is: ${otp}\n\nThis code will expire in 10 minutes. If you did not create a HealthVault account, please ignore this email.\n\nBest regards,\nThe HealthVault Team`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; background-color: #0f172a; color: #f8fafc; border-radius: 8px;">
-        <div style="border-bottom: 1px solid #334155; padding-bottom: 16px; margin-bottom: 20px;">
+        <div style="border-bottom: 1px side #334155; padding-bottom: 16px; margin-bottom: 20px;">
           <h2 style="margin: 0; color: #38bdf8;">HealthVault</h2>
           <p style="margin: 4px 0 0; color: #94a3b8; font-size: 14px;">Personal Medical Document Intelligence</p>
         </div>
@@ -96,14 +98,3 @@ export const sendVerificationOtpEmail = async (toEmail, otp) => {
     throw new Error(`Failed to send verification email: ${error.message}`);
   }
 };
-return nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    connectionTimeout: 15000, // 15 seconds max wait
-    socketTimeout: 15000,
-    auth: {
-      user,
-      pass,
-    },
-  });
