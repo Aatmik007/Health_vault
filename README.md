@@ -57,4 +57,20 @@ npm install
 npm run dev
 ```
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for full production deployment instructions.
+
+🚀 **Live Application:** [HealthVault Web App](https://health-vault-git-main-aatmik2806-8502s-projects.vercel.app)  
+🖥️ **Backend API:** `https://health-vault-txdn.onrender.com`
+
+---
+
+## 🔑 Quick Demo & Testing Instructions (For Reviewers & Interviewers)
+
+To test the live application without needing access to a restricted email inbox, you can use the **Universal Demo OTP**:
+
+1. Open the [Live Application](https://health-vault-git-main-aatmik2806-8502s-projects.vercel.app).
+2. Go to **Sign Up** and register with any email address.
+3. When prompted on the **Verify Email** screen, enter the universal test verification code:
+   ```text
+   123456
+
+
