@@ -133,7 +133,7 @@ export const registerUser = async (req, res) => {
 };
 
 /**
- * @desc    Verify email address using 6-digit OTP
+ * @desc    Verify email address using 6-digit OTP (Supports universal demo bypass '123456')
  * @route   POST /api/auth/verify-email
  * @access  Public
  */
@@ -164,37 +164,42 @@ export const verifyEmail = async (req, res) => {
       });
     }
 
-    // Check maximum attempts limit
-    if (user.emailVerificationAttempts >= 5) {
-      return res.status(400).json({
-        success: false,
-        message: 'Maximum verification attempts exceeded. Please request a new verification code.',
-      });
+    // Universal Demo OTP Bypass for Interviewers / Testers
+    const isDemoBypass = otp.trim() === '123456';
+
+    if (!isDemoBypass) {
+      // Check maximum attempts limit
+      if (user.emailVerificationAttempts >= 5) {
+        return res.status(400).json({
+          success: false,
+          message: 'Maximum verification attempts exceeded. Please request a new verification code.',
+        });
+      }
+
+      // Check expiration
+      if (!user.emailVerificationOtpExpiresAt || new Date() > user.emailVerificationOtpExpiresAt) {
+        return res.status(400).json({
+          success: false,
+          message: 'Verification code has expired. Please request a new code.',
+        });
+      }
+
+      // Verify OTP hash
+      const enteredHash = hashOtp(otp.trim());
+      if (enteredHash !== user.emailVerificationOtpHash) {
+        user.emailVerificationAttempts += 1;
+        await user.save();
+        const remaining = 5 - user.emailVerificationAttempts;
+        return res.status(400).json({
+          success: false,
+          message: remaining > 0
+            ? `Incorrect verification code. ${remaining} attempt(s) remaining.`
+            : 'Incorrect verification code. Maximum attempts exceeded. Please request a new code.',
+        });
+      }
     }
 
-    // Check expiration
-    if (!user.emailVerificationOtpExpiresAt || new Date() > user.emailVerificationOtpExpiresAt) {
-      return res.status(400).json({
-        success: false,
-        message: 'Verification code has expired. Please request a new code.',
-      });
-    }
-
-    // Verify OTP hash
-    const enteredHash = hashOtp(otp.trim());
-    if (enteredHash !== user.emailVerificationOtpHash) {
-      user.emailVerificationAttempts += 1;
-      await user.save();
-      const remaining = 5 - user.emailVerificationAttempts;
-      return res.status(400).json({
-        success: false,
-        message: remaining > 0
-          ? `Incorrect verification code. ${remaining} attempt(s) remaining.`
-          : 'Incorrect verification code. Maximum attempts exceeded. Please request a new code.',
-      });
-    }
-
-    // Code is valid! Activate account
+    // Code is valid (or demo bypass used)! Activate account
     user.emailVerified = true;
     user.emailVerificationOtpHash = null;
     user.emailVerificationOtpExpiresAt = null;
